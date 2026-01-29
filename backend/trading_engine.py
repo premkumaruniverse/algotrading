@@ -1,5 +1,6 @@
 import time
 import datetime
+import pytz
 import pandas as pd
 import pandas_ta as ta
 from kiteconnect import KiteConnect
@@ -11,6 +12,9 @@ import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("TradingEngine")
+
+# Timezone Configuration
+IST = pytz.timezone('Asia/Kolkata')
 
 # Configuration (These could be dynamic or user specific)
 INTERVAL = "5minute"
@@ -34,7 +38,7 @@ class TradingEngine:
 
     def get_nifty_expiry(self):
         # Logic to get current month NIFTY Futures symbol
-        today = datetime.date.today()
+        today = datetime.datetime.now(IST).date()
         # simplified: assuming format NIFTY YYMMM FUT e.g. NIFTY 24JAN FUT
         # But symbols are specific. 
         # For now, let's hardcode or fetch from an instrument list if possible.
@@ -63,7 +67,15 @@ class TradingEngine:
         return None # To be implemented with live data check
 
     def run_strategy(self):
-        logger.info("Trading Engine Heartbeat")
+        # Check Trading Hours (IST)
+        now_ist = datetime.datetime.now(IST)
+        current_time = now_ist.time()
+        
+        if not (START_TIME <= current_time <= END_TIME):
+            logger.info(f"Outside trading hours (IST): {current_time}. Market closed.")
+            return
+
+        logger.info(f"Trading Engine Heartbeat (IST): {now_ist}")
         db = SessionLocal()
         active_users = db.query(models.User).filter(models.User.is_trading_active == True).all()
         
@@ -87,8 +99,8 @@ class TradingEngine:
                 
                 # Find current month future
                 # This is a simplification. Real code needs robust expiry handling.
-                current_month_str = datetime.datetime.now().strftime("%y%b").upper() # 24JAN
-                fut_symbol_pattern = f"NIFTY {datetime.datetime.now().strftime('%b').upper()} FUT" # NIFTY JAN FUT
+                current_month_str = now_ist.strftime("%y%b").upper() # 24JAN
+                fut_symbol_pattern = f"NIFTY {now_ist.strftime('%b').upper()} FUT" # NIFTY JAN FUT
                 
                 # Search for exactly NIFTY JAN FUT (Kite format usually NIFTY24JANFUT or similar)
                 # Let's look for name=NIFTY, segment=NFO-FUT
@@ -103,7 +115,7 @@ class TradingEngine:
                 fut_symbol = curr_fut['tradingsymbol'] # e.g., NIFTY24JANFUT
                 
                 # 2. Get Historical Data
-                to_date = datetime.datetime.now()
+                to_date = now_ist
                 from_date = to_date - datetime.timedelta(days=5)
                 
                 data = kite.historical_data(fut_token, from_date, to_date, INTERVAL)

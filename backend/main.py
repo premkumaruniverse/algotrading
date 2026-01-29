@@ -6,6 +6,7 @@ from . import crud, models, schemas, database, trading_engine
 from .database import engine
 from kiteconnect import KiteConnect
 from apscheduler.schedulers.background import BackgroundScheduler
+import pytz
 import uvicorn
 import logging
 
@@ -22,7 +23,7 @@ app.add_middleware(
 )
 
 # Scheduler for Trading Engine
-scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler(timezone=pytz.timezone('Asia/Kolkata'))
 engine_instance = trading_engine.TradingEngine()
 
 # Run strategy every 1 minute (For testing, maybe 5 min in prod)

@@ -123,7 +123,7 @@ function Dashboard({ setToken }) {
         <div className="card">
           <h3 style={{ marginTop: 0 }}>Daily Login (Kite Connect)</h3>
           <div style={{ marginBottom: '15px' }}>
-            <p style={{ margin: '5px 0' }}>Access Token: {user.access_token ? <span style={{ color: 'green', fontWeight: 'bold' }}>Active</span> : <span style={{ color: 'red', fontWeight: 'bold' }}>Inactive</span>}</p>
+            <p style={{ margin: '5px 0' }}>Access Token: {user.access_token ? <span style={{ color: 'green', fontWeight: 'bold' }}>active</span> : <span style={{ color: 'red', fontWeight: 'bold' }}>Inactive</span>}</p>
             <p style={{ margin: '5px 0', fontSize: '0.9em', color: '#888' }}>Last Updated: {user.request_token_updated_at ? new Date(user.request_token_updated_at).toLocaleString() : 'Never'}</p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>

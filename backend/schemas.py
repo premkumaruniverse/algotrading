@@ -44,6 +44,9 @@ class User(UserBase):
     num_lots: int
     trades: List[Trade] = []
     api_key: Optional[str] = None # Should probably hide this in real app, but ok for now
+    api_secret: Optional[str] = None
+    access_token: Optional[str] = None
+    request_token_updated_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True
